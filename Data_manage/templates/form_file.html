@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>新增检测任务</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <h4 style="padding-top: 0px; margin-top: 0px; color:deepskyblue">新增检测任务</h4>
+    <div class="container">
+        <form class="form-horizontal" role="form" method="POST" action="/Data_manage/add_task/">
+          <div class="form-group">
+            <label for="task_code" class="control-label col-md-2">焊接任务编码:</label>
+            <div class="col-md-6">
+              <input type="text" class="form-control" id="task_code" placeholder="请输入任务编码" name="task_code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="weld_method" class="col-md-2 control-label">焊接方法:</label>
+            <div class="col-md-6">
+              <select class="form-control" name="weld_method">
+                  <option>选择焊接方法</option>
+                  <option>激光焊接</option>
+                  <option>电弧焊</option>
+                  <option>点焊</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="worker_code" class="col-md-2 control-label">焊接执行人:</label>
+            <div class="col-md-6">
+              <input type="text" class="form-control" id="worker_code" placeholder="请输入工号" name="worker_code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="product_code" class="col-md-2 control-label">对应产品:</label>
+            <div class="col-md-6">
+              <input type="text" class="form-control" id="product_code" placeholder="请输入产品编码" name="product_code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="machine_code" class="col-md-2 control-label">焊机编码:</label>
+            <div class="col-md-6">
+              <input type="text" class="form-control" id="machine_code" placeholder="请输入焊机编码" name="machine_code">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="process_card" class="col-md-2 control-label">上传工艺卡片:</label>
+            <div class="col-md-6">
+              <input type="file"  class="fileinput" id="process_card" placeholder="上传工艺卡片" name="process_card">
+            </div>
+          </div>
+          <div class="form-group">
+              <label for="app_test" class="col-md-2 control-label">是否外观检测：</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="app_test" name="app_test">
+                </label>
+              </div>
+          </div>
+          <div class="form-group">
+              <label for="ray_test" class="col-md-2 control-label">是否射线检测：</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="ray_test" name="ray_test">
+                </label>
+              </div>
+          </div>
+          <div class="form-group">
+            <label for="other_test" class="col-md-2 control-label">其他检测方法：</label>
+            <div class="col-md-6">
+              <select class="form-control" name="other_test">
+                  <option>不需要其他检测</option>
+                  <option>超声检测</option>
+                  <option>硬度检测</option>
+                  <option>破坏性检测</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-offset-4 col-sm-10">
+              <button type="submit" class="btn btn-default">提交</button>
+            </div>
+          </div>
+        </form>
+    </div>
+</body>
+</html>

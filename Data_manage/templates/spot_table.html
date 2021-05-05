@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>显示表格</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $('#task_code').val({{ task_id }}).attr('selected', 'selected');
+        });
+    </script>
+</head>
+<body>
+    <h4 style="padding-top: 0px; margin-top: 0px; color:deepskyblue">焊点数据查询</h4>
+    <div class="form-group container">
+
+        <form class="form-horizontal" role="form" method="POST" id="select_task" action="/Data_manage/spot_table/">
+            <div class="form-group">
+                <label for="task_id" class="col-md-2">选择检测任务:</label>
+                <select class="form-control col-md-2" id="task_code" name="task_id">
+                  {% for item in task_list %}
+                      <option value="{{ item.id }}"> {{ item.task_code }} </option>
+                  {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="spot_code" class="col-md-2 control-label">新增焊点检测记录:</label>
+                <div class="col-md-8">
+                  <input type="text" class="form-control" id="spot_code" placeholder="输入焊点编码" name="spot_code">
+                </div>
+                <button type="submit" class="btn btn-default col-md-2" id="add_spot">提交</button>
+            </div>
+        </form>
+    </div>
+    <div class="container">
+        <div>
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th colspan="1" bgcolor="#faebd7">任务：{{ task_id }}</th>
+                    <th colspan="6" bgcolor="#a9a9a9">外观检测</th>
+                    <th colspan="6" bgcolor="#faebd7">射线检测</th>
+                    <th colspan="1" bgcolor="#a9a9a9"></th>
+                </tr>
+                <tr>
+                    <th bgcolor="#faebd7">焊点编码</th>
+                    <th bgcolor="#a9a9a9">检测进度</th>
+                    <th bgcolor="#a9a9a9">检测员</th>
+                    <th bgcolor="#a9a9a9">缺陷类型</th>
+                    <th bgcolor="#a9a9a9">检测结果</th>
+                    <th bgcolor="#a9a9a9">备注信息</th>
+                    <th bgcolor="#a9a9a9">时间</th>
+                    <th bgcolor="#faebd7">检测进度</th>
+                    <th bgcolor="#faebd7">检测员</th>
+                    <th bgcolor="#faebd7">缺陷类型</th>
+                    <th bgcolor="#faebd7">检测结果</th>
+                    <th bgcolor="#faebd7">备注信息</th>
+                    <th bgcolor="#faebd7">时间</th>
+                    <th bgcolor="#a9a9a9">操作</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data_list %}
+                    <tr>
+                        <td>{{ item.spot_code }}</td>
+                        <td>
+                            {% if item.app_test_status == None %}
+                                未检测
+                            {% else %}
+                                item.app_test_status
+                            {% endif %}
+                        </td>
+                        <td>{{ item.app_inspector_code }}</td>
+                        <td>{{ item.app_defect_type }}</td>
+                        <td>{{ item.app_test_result }}</td>
+                        <td>{{ item.app_test_notes }}</td>
+                        <td>{{ item.app_test_time }}</td>
+                        <td>
+                            {% if item.ray_test_status == None %}
+                                未检测
+                            {% else %}
+                                item.ray_test_status
+                            {% endif %}
+                        </td>
+                        <td>{{ item.ray_inspector_code }}</td>
+                        <td>{{ item.ray_defect_type }}</td>
+                        <td>{{ item.ray_test_result }}</td>
+                        <td>{{ item.ray_test_notes }}</td>
+                        <td>{{ item.ray_test_time }}</td>
+                        <td>
+                            <a href="/Data_manage/del_spot/?id={{ item.id }}"><span class="glyphicon glyphicon-trash"></span> </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+<script>
+    $(document).ready(function(){
+	$('#task_code').change(
+	    function (){
+	        $('#select_task').submit();
+        }
+    );
+});
+</script>
+
+<script>
+    $(document).ready(function(){
+	$('').change(
+	    function (){
+	        $('#select_task').submit();
+        }
+    );
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>外观检测数据集管理</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $('#spot_table').children('tbody').children('tr').hover(function (){$(this).css('cursor','pointer')});
+          $('#app_img').css("transform","rotate(90deg)");
+        });
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        <b>外观检测数据集管理</b>
+                    </h2>
+                </div>
+            </div>
+        <div class="col-xs-2" style="border-right-style:solid; border-right-width: thin; border-right-color: grey;padding-right: 30px">
+            <div>
+                <table class="table table-hover table-condensed" id="spot_table">
+                    <thead>
+                        <tr>
+                            <th bgcolor="#faebd7">焊点编码</th>
+                            <th bgcolor="#faebd7">标注状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in data_list %}
+                        <tr>
+                            <td>{{ item.spot_code }}</td>
+                            <td>
+                                {% if item.app_test_status == None %}
+                                    <a>未检测<span hidden>{{ item.id }}</span></a>
+                                {% else %}
+                                    <a>item.app_test_status<span>{{ item.id }}</span></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-xs-10">
+            <div class="container-fluid">
+                <div>
+                            <table width="100%">
+                                <tr>
+                                    <td>
+                                        <button id="pre_img" type="button" class="btn btn-default btn-md" style="height: 200px"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                                    </td>
+                                    <td rowspan="2" align="center">
+                                         <img src="/static/app_images/default.png" width="500px" id="app_img">
+                                    </td>
+                                    <td align="right">
+                                        <button id="next_img" type="button" class="btn btn-default btn-md" style="height: 200px"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                                    </td>
+                                </tr>
+                             </table>
+                </div>
+                <div class="form-group">
+                    <form class="form-horizontal" role="form" method="POST" id="test_result_form">
+                        <div class="form-group">
+                            <P id="defect_type" style="color: red"></P>
+                            <label class="control-label">缺陷：</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type1" class="defect_type">正常</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type2" class="defect_type">类型1</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type3" class="defect_type">类型2</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type4" class="defect_type">类型3</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type5" class="defect_type">类型4</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type6" class="defect_type">类型5</label>
+                        </div>
+                    </form>
+                    <div class="form-group">
+                        <button class="btn btn-default" id="test_result_submit">提交检测结果</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function(){
+        $('#spot_table>tbody>tr').click(
+            function () {
+                $.get(
+                    '/AppTest/apptest_result_save/',
+                    {
+                        spot_id: $(this).children('td').children('a').children('span').text()
+                    },
+                    function (data){
+                        var data = JSON.parse(data);
+                        if(data.app_defect_type_0==1){$('#type1').prop('checked', true)}
+                        else {$('#type1').prop('checked', false)}
+                        if(data.app_defect_type_1==1){$('#type2').prop('checked', true)}
+                        else {$('#type2').prop('checked', false)}
+                        if(data.app_defect_type_2==1){$('#type3').prop('checked', true)}
+                        else {$('#type3').prop('checked', false)}
+                        if(data.app_defect_type_3==1){$('#type4').prop('checked', true)}
+                        else {$('#type4').prop('checked', false)}
+                        if(data.app_defect_type_4==1){$('#type5').prop('checked', true)}
+                        else {$('#type5').prop('checked', false)}
+                        if(data.app_defect_type_5==1){$('#type6').prop('checked', true)}
+                        else {$('#type6').prop('checked', false)}
+                        $('#defect_type').text('');
+                        app_img_file_list = data.img_file_list;
+                        folder = data.spot_code
+                        cur = 0;
+                        $('#app_img').attr('src', '/static/app_images/' + folder + '/' + app_img_file_list[cur]);
+                });
+            });
+        $('#pre_img').click(
+            function (){
+                if (cur>0) {
+                    cur -= 1;
+                    $('#app_img').attr('src', '/static/app_images/' + folder + '/' + app_img_file_list[cur]);
+                }
+            });
+        $('#next_img').click(
+            function (){
+                if (cur<app_img_file_list.length-1) {
+                    cur += 1;
+                    $('#app_img').attr('src', '/static/app_images/' + folder + '/' + app_img_file_list[cur]);
+                }
+            });
+});
+</script>
+
+</body>
+</html>

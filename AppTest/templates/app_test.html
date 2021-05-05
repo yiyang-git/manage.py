@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>外观检测</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        .img_list
+        {
+
+        }
+        .img_list:hover
+        {
+            background-color: cornsilk;
+            cursor: pointer;
+        }
+        .img_list_selected
+        {
+            background-color: #dfdfdf;
+            font-size: medium;
+            border-left-style: solid;
+            border-left-color: #525252;
+            border-left-width: 3px;
+        }
+        .img_radio_div
+        {
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        $(document).ready(function(){
+          $('#task_code_selection').val({{ task_id }}).attr('selected', 'selected');
+          $('#task_code').text("任务编号："+$('#task_code_selection').find('option:selected').text());
+          $('#task_code_right').val($('#task_code_selection').find('option:selected').text());
+          $('a').hover(function (){$(this).css('cursor','pointer')});
+
+        });
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        <b>外观检测    </b>     |    <span id = 'task_code'></span>
+                    </h2>
+                </div>
+
+            </div>
+        <div class="col-xs-2" style="border-right-style:solid; border-right-width: thin; border-right-color: grey;padding-right: 30px">
+            <div class="form-group">
+                <form class="form-horizontal" role="form" method="POST" id="select_task" action="/AppTest/apptest/">
+                    <div class="form-group">
+                        <label for="task_id">选择检测任务:</label>
+                        <select class="form-control col-md-2" id="task_code_selection" name="task_id">
+                          {% for item in task_list %}
+                              <option value="{{ item.id }}"> {{ item.task_code }} </option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label for="spot_code">新增焊点检测记录:</label>
+                        <input type="text" class="form-control" id="spot_code" placeholder="输入焊点编码" name="spot_code">
+                    </div>
+                    <div class="form-group" hidden>
+                        <button type="submit" class="btn btn-default" id="add_spot">提交</button>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <table class="table table-hover table-striped" id="spot_table">
+                    <thead>
+                        <tr>
+                            <th bgcolor="#faebd7">焊点编码</th>
+                            <th bgcolor="#faebd7">检测状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in data_list %}
+                        <tr>
+                            <td>{{ item.spot_code }}</td>
+                            <td>
+                                {% if item.app_test_status == None %}
+                                    <a>未检测<span hidden>{{ item.id }}</span></a>
+                                {% else %}
+                                    <a>item.app_test_status<span>{{ item.id }}</span></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-xs-10">
+            <div class="container-fluid">
+                <div class="form-group">
+                    <form class="form-horizontal" role="form" method="POST" id="test_result_form">
+                        <div class="form-group">
+                            <div class="form-group col-md-3">
+                                <label class="control-label">焊点编码：</label>
+                                <input disabled type="text" value="" id="spot_code_display">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="control-label">任务编号：</label>
+                                <input disabled type="text" value="" id="task_code_right">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="control-labe">检测员工号：</label>
+                                <input type="text" value="" id="app_inspector_code">
+                            </div>
+                            <div class="form-group col-md-3" >
+                                <button type="button" class="btn btn-primary" id="start_test"><span class="glyphicon glyphicon-play"></span>开始检测</button>
+                               <img src="/static/images/computing.gif" hidden id="computing">
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <div class="col-md-2">
+                                <h5>图像列表:</h5>
+                                <div style="overflow-y: scroll; height: 480px;">
+                                    <ul class="list-unstyled" id="img_list">
+                                    </ul>
+                                </div>
+                                <button type="button" class="btn btn-default btn-xs" id="img_type_save">
+                                    <span class="glyphicon glyphicon-floppy-save"></span> 保存图像分类结果
+                                </button>
+                            </div>
+                            <div class="col-md-10">
+                                <table width="100%">
+                                    <tr>
+                                        <td>
+                                            <button id="pre_img" type="button" class="btn btn-default btn-md" style="height: 300px;border-style: hidden"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                                        </td>
+                                        <td rowspan="2" align="center" style="border-style: solid; padding-bottom: 0">
+                                            <div class="container-fluid">
+                                                <div class="col-md-10">
+                                                    <img src="/static/app_images/picture_defalut.png" width="500px" id="app_img">
+                                                </div>
+                                                <div class="col-md-2" id='img_type_radios' style="padding-top: 100px" hidden>
+                                                    <label>当前图像分类结果：</label>
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="img_optionsRadios" id="img_type1" value=0 class="img_radio"> 选项 1
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="img_optionsRadios" id="img_type2" value=1 class="img_radio">选项 2
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="img_optionsRadios" id="img_type3" value=2 class="img_radio">选项 3
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="img_optionsRadios" id="img_type4" value=3 class="img_radio">选项 4
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="img_optionsRadios" id="img_type5" value=4 class="img_radio">选项 5
+                                                        </label>
+                                                    </div>
+                                                    <div class="radio">
+                                                        <label>
+                                                            <input type="radio" name="img_optionsRadios" id="img_type6" value=5 class="img_radio">选项 6
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td align="right">
+                                            <button id="next_img" type="button" class="btn btn-default btn-md" style="height: 300px;border-style: hidden"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <P id="defect_type" style="color: red"></P>
+                            <label class="control-label">缺陷：</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type1" class="defect_type">正常</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type2" class="defect_type">类型1</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type3" class="defect_type">类型2</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type4" class="defect_type">类型3</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type5" class="defect_type">类型4</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type6" class="defect_type">类型5</label>
+                        </div>
+                        <div class="form-group">
+                            <label>检测结果：</label>
+                            <select class="form-control" id="test_result">
+                                <option>无</option>
+                                <option>合格</option>
+                                <option>返修</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">备注信息：</label>
+                            <textarea class="form-control" rows="3" placeholder="请输入备注信息" id="test_notes"></textarea>
+                        </div>
+                        <input disabled hidden type="text" value="" id="spot_id">
+                    </form>
+                    <div class="form-group">
+                        <button class="btn btn-default" id="test_result_submit">提交检测结果</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    $(document).ready(function(){
+        $('#task_code_selection').change(
+	    function (){
+	        $('#select_task').submit();
+        }
+    );
+});
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#spot_table>tbody>tr>td').click(
+            function () {
+                $.get(
+                    '/AppTest/apptest_result_save/',
+                    {
+                        spot_id: $(this).children('a').children('span').text()
+                    },
+                    function (data){
+                        var data = JSON.parse(data);
+                        $('#spot_id').val(data.spot_id);
+                        $('#spot_code_display').val(data.spot_code);
+                        $('#app_inspector_code').val(data.inspector);
+                        $('#test_notes').val(data.app_test_notes);
+                        $('#test_result').val(data.app_test_result).attr('selected', 'selected');
+                        if(data.app_defect_type_0==1){$('#type1').prop('checked', true)}
+                        else {$('#type1').prop('checked', false)}
+                        if(data.app_defect_type_1==1){$('#type2').prop('checked', true)}
+                        else {$('#type2').prop('checked', false)}
+                        if(data.app_defect_type_2==1){$('#type3').prop('checked', true)}
+                        else {$('#type3').prop('checked', false)}
+                        if(data.app_defect_type_3==1){$('#type4').prop('checked', true)}
+                        else {$('#type4').prop('checked', false)}
+                        if(data.app_defect_type_4==1){$('#type5').prop('checked', true)}
+                        else {$('#type5').prop('checked', false)}
+                        if(data.app_defect_type_5==1){$('#type6').prop('checked', true)}
+                        else {$('#type6').prop('checked', false)}
+                        $('#defect_type').text('');
+                        app_img_file_list = data.img_file_list;
+                        img_type_seq = new Array(app_img_file_list.length).fill(-1)
+                        $('#img_list').find('li').remove()
+                        for (var i=0; i<app_img_file_list.length; i++){
+                            var e=$('<li class="img_list"></li>').text(app_img_file_list[i]);
+                            $('#img_list').append(e)
+                        };
+                        folder = data.spot_code
+                        cur = 0;
+                        $('#app_img').attr('src', '/static/app_images/' + folder + '/' + app_img_file_list[cur]);
+                        $('#img_list').find('li').removeClass('img_list_selected');
+                        $('#img_list').find('li').eq(cur).addClass('img_list_selected');
+                        if (img_type_seq[cur]<0){$('#img_type_radios').hide()}
+                });
+            });
+        $('#pre_img').click(
+            function (){
+                if ($('#spot_id').val() == '')
+                {alert('请选择焊点')}
+                else {
+                    if (cur>0) {
+                    cur -= 1;
+                    $('#app_img').attr('src', '/static/app_images/' + folder + '/' + app_img_file_list[cur]);
+                    $('#img_list').find('li').removeClass('img_list_selected')
+                    $('#img_list').find('li').eq(cur).addClass('img_list_selected')
+                    $("#img_type_radios").find("input").eq(img_type_seq[cur]).prop('checked', true)}
+                }
+            });
+        $('#next_img').click(
+            function (){
+                if ($('#spot_id').val() == '')
+                {alert('请选择焊点')}
+                else{
+                    if (cur<app_img_file_list.length-1) {
+                    cur += 1;
+                    $('#app_img').attr('src', '/static/app_images/' + folder + '/' + app_img_file_list[cur]);
+                    $('#img_list').find('li').removeClass('img_list_selected')
+                    $('#img_list').find('li').eq(cur).addClass('img_list_selected')
+                    $("#img_type_radios").find("input").eq(img_type_seq[cur]).prop('checked', true)}
+                }
+            });
+        $('#start_test').click(
+            function () {
+                $('#computing').show()
+                if ($('#spot_id').val() == '')
+                {alert('请选择焊点')
+                 $('#computing').hide()}
+                else {
+                    $.post(
+                    '/AppTest/start_app_test/',
+                    {
+                        spot_code: $('#spot_code_display').val(),
+                    },
+                    function (data){
+                        var data = JSON.parse(data);
+                        $('#computing').hide()
+                        alert('检测完成！\n发现的缺陷：' + data.result);
+                        $('#defect_type').text('检测到的缺陷：' + data.result);
+                        if (data.type[0] > 0) {$('#type1').prop('checked', true)};
+                        if (data.type[1] > 0) {$('#type2').prop('checked', true)};
+                        if (data.type[2] > 0) {$('#type3').prop('checked', true)};
+                        if (data.type[3] > 0) {$('#type4').prop('checked', true)};
+                        if (data.type[4] > 0) {$('#type5').prop('checked', true)};
+                        if (data.type[5] > 0) {$('#type6').prop('checked', true)};
+                        img_type_seq = data.img_type_seq
+                        $('#img_type_radios').show();
+                        $("#img_type_radios").find("input").eq(img_type_seq[cur]).prop('checked', true);
+                        })
+                };
+            });
+        $('ul').on("click", 'li',
+            function () {
+                cur = $('#img_list .img_list').index(this)
+                console.log(cur)
+                $('#app_img').attr('src', '/static/app_images/' + folder + '/' + app_img_file_list[cur]);
+                $('#img_list').find('li').removeClass('img_list_selected');
+                $('#img_list').find('li').eq(cur).addClass('img_list_selected');
+                $("#img_type_radios").find("input").eq(img_type_seq[cur]).prop('checked', true)
+            });
+        $('.img_radio').click(
+            function () {
+                var r = confirm("确定修改当前图像类型？")
+                if (r==true){
+                    img_type_seq[cur] = $(this).val()
+                    alert('修改成功')
+                }
+                else {
+                    $("#img_type_radios").find("input").eq(img_type_seq[cur]).prop('checked', true)
+                }
+            });
+        $('#img_type_save').click(
+            function (){
+                if ($('#spot_id').val() == '')
+                {alert('请选择焊点')}
+                else {
+                    if (img_type_seq[0]<0){alert('请先执行检测！')}
+                    else {
+                        $.ajax(
+                            {
+                                url: '/AppTest/app_dataset/',
+                                type: 'POST',
+                                data: {spot_id: $('#spot_id').val(),
+                                        img_list: app_img_file_list,
+                                        type_list: img_type_seq,
+                                        },
+                                traditional: true,
+                                success: function (callback){
+                                    alert('您的数据集已更新！')
+                                }
+                            }
+                        )
+                    }
+                }
+            });
+});
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#test_result_submit').click(
+            function () {
+                if ($('#spot_id').val() == '')
+                {alert('请选择焊点')}
+                else {
+                    $.post(
+                    '/AppTest/apptest_result_save/',
+                    {
+                        spot_id: $('#spot_id').val(),
+                        inspector: $('#app_inspector_code').val(),
+                        test_result: $('#test_result').val(),
+                        test_notes: $('#test_notes').val(),
+                        defect_types: $('#type1').prop('checked')+' '
+                                    +$('#type2').prop('checked')+' '
+                                    +$('#type3').prop('checked')+' '
+                                    +$('#type4').prop('checked')+' '
+                                    +$('#type5').prop('checked')+' '
+                                    +$('#type6').prop('checked')+' ',
+                    },
+                    function (data){
+                        alert('检测结果提交成功！\n备注信息：'+data)
+                        })
+                };
+            });
+});
+</script>
+
+
+</body>
+</html>

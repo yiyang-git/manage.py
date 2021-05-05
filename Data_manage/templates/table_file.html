@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>显示表格</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <h4 style="padding-top: 0px; margin-top: 0px; color:deepskyblue">检测数据查询与管理</h4>
+    <div class="container">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>任务编码</th>
+                    <th>焊接方法</th>
+                    <th>工艺执行人</th>
+                    <th>焊机编码</th>
+                    <th>产品编码</th>
+                    <th>工艺信息卡</th>
+                    <th>外观检验</th>
+                    <th>射线检验</th>
+                    <th>其他检验</th>
+                    <th>操作</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data_list %}
+                    <tr>
+                        <td>{{ item.task_code }}</td>
+                        <td>{{ item.weld_method }}</td>
+                        <td>{{ item.worker_code }}</td>
+                        <td>{{ item.machine_code }}</td>
+                        <td>{{ item.product_code }}</td>
+                        <td>
+                            <a href="/Data_manage/scan_process/?file_name={{ item.process_card }}">{{ item.process_card }}</a>
+                        </td>
+                        <td>
+                            {% if item.app_test %}
+                                是
+                            {% else %}
+                                否
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.ray_test %}
+                                是
+                            {% else %}
+                                否
+                            {% endif %}
+                        </td>
+                        <td>{{ item.other_test_method }}</td>
+                        <td>
+                            <a href="/Data_manage/spot_table/?task_id={{ item.id }}"><span class="glyphicon glyphicon-search"></span>查看</a> |
+                            <a href="/Data_manage/edit_task/?id={{ item.id }}"><span class="glyphicon glyphicon-edit"></span> 编辑</a> |
+                            <a href="/Data_manage/del_data/?id={{ item.id }}"><span class="glyphicon glyphicon-trash"></span> 删除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+        <ul class="pagination" style="position: relative; float: right; right: 50%; ">
+            <li><a href="#">&laquo;</a></li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li><a href="#">&raquo;</a></li>
+        </ul>
+    </div>
+</body>
+</html>

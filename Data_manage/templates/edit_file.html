@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>编辑检测任务</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $('#weldmethod #{{ task.weld_method }}').attr('selected', 'selected');
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
+          $('#othermethod #{{ task.other_test_method }}').attr('selected', 'selected');
+
+        });
+    </script>
+</head>
+<body>
+    <h4 style="padding-top: 0px; margin-top: 0px; color:deepskyblue">编辑检测任务</h4>
+    <div class="container">
+        <form class="form-horizontal" role="form" method="POST" action="/Data_manage/edit_task/?nid={{ task.id }}">
+          <div class="form-group">
+            <label for="task_code" class="col-md-2 control-label">焊接任务编码:</label>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="task_code" placeholder="请输入任务编码" name="task_code" value="{{ task.task_code }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="weld_method" class="col-md-2 control-label">焊接方法:</label>
+            <div class="col-md-2">
+              <select class="form-control" name="weld_method" id="weldmethod">
+                  <option id="激光焊接">激光焊接</option>
+                  <option id="电弧焊">电弧焊</option>
+                  <option id="点焊">点焊</option>
+                  <option id="选择焊接方法">选择焊接方法</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="worker_code" class="col-md-2 control-label">焊接执行人:</label>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="worker_code" placeholder="请输入工号" name="worker_code" value="{{ task.worker_code }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="product_code" class="col-md-2 control-label">对应产品:</label>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="product_code" placeholder="请输入产品编码" name="product_code" value="{{ task.product_code }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="machine_code" class="col-md-2 control-label">焊机编码:</label>
+            <div class="col-md-2">
+              <input type="text" class="form-control" id="machine_code" placeholder="请输入焊机编码" name="machine_code" value="{{ task.machine_code }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="process_card" class="col-md-2 control-label">上传工艺卡片:</label>
+            <div class="col-md-2">
+              <input type="file"  class="fileinput" id="process_card" placeholder="上传工艺卡片" name="process_card" value="{{ task.process_card }}">
+            </div>
+          </div>
+          <div class="form-group">
+              <label for="app_test" class="col-md-2 control-label">是否外观检测：</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="app_test" name="app_test" {% if task.app_test == True %} checked {% endif %}>
+                </label>
+              </div>
+          </div>
+          <div class="form-group">
+              <label for="ray_test" class="col-md-2 control-label">是否射线检测：</label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="ray_test" name="ray_test" {% if task.ray_test == True %} checked {% endif %}>
+                </label>
+              </div>
+          </div>
+          <div class="form-group">
+            <label for="other_test" class="col-md-2 control-label">其他检测方法：</label>
+            <div class="col-md-2">
+              <select class="form-control" name="other_test" id="othermethod">
+                  <option id="超声检测">超声检测</option>
+                  <option id="硬度检测">硬度检测</option>
+                  <option id="破坏性检测">破坏性检测</option>
+                  <option id="不需要其他检测">不需要其他检测</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-offset-2 col-sm-10">
+              <button type="submit" class="btn btn-default">提交</button>
+            </div>
+          </div>
+        </form>
+    </div>
+</body>
+</html>

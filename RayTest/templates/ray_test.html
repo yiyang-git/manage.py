@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>射线检测</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"/>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $('#task_code_selection').val({{ task_id }}).attr('selected', 'selected');
+          $('#task_code').text("任务编号："+$('#task_code_selection').find('option:selected').text());
+          $('#task_code_right').val($('#task_code_selection').find('option:selected').text());
+          $('a').hover(function (){$(this).css('cursor','pointer')});
+          {#$('#app_img').css("transform","rotate(90deg)");#}
+        });
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="col-xs-2" style="border-right-style:solid; border-right-width: thin; border-right-color: grey;padding-right: 30px">
+            <div class="form-group">
+                <form class="form-horizontal" role="form" method="POST" id="select_task" action="/RayTest/raytest/">
+                    <div class="form-group">
+                        <label for="task_id">选择检测任务:</label>
+                        <select class="form-control col-md-2" id="task_code_selection" name="task_id">
+                          {% for item in task_list %}
+                              <option value="{{ item.id }}"> {{ item.task_code }} </option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" hidden>
+                        <label for="spot_code">新增焊点检测记录:</label>
+                        <input type="text" class="form-control" id="spot_code" placeholder="输入焊点编码" name="spot_code">
+                    </div>
+                    <div class="form-group" hidden>
+                        <button type="submit" class="btn btn-default" id="add_spot">提交</button>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <p id = 'task_code'></p>
+                <table class="table table-hover table-striped" id="spot_table">
+                    <thead>
+                        <tr>
+                            <th bgcolor="#faebd7">焊点编码</th>
+                            <th bgcolor="#faebd7">检测状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in data_list %}
+                        <tr>
+                            <td>{{ item.spot_code }}</td>
+                            <td>
+                                {% if item.ray_test_status == None %}
+                                    <a>未检测<span hidden>{{ item.id }}</span></a>
+                                {% else %}
+                                    <a>{{ item.ray_test_status }}<span hidden>{{ item.id }}</span></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-xs-10">
+            <div class="container-fluid">
+                <div class="form-group">
+                    <form class="form-horizontal" role="form" method="POST" id="test_result_form">
+                        <div class="form-group">
+                            <div class="form-group col-md-4">
+                                <label class="control-label">焊点编码：</label>
+                                <input disabled type="text" value="" id="spot_code_display">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="control-label">所属任务编号：</label>
+                                <input disabled type="text" value="" id="task_code_right">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="control-labe">检测员工号：</label>
+                                <input type="text" value="" id="ray_inspector_code">
+                            </div>
+                        </div>
+                        <div style="height: 620px; overflow:scroll">
+                            <img src="/static/ray_images/2.png"  id="ray_img">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">缺陷类型：</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type1">正常</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type2">类型1</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type3">类型2</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type4">类型3</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type5">类型4</label>
+                            <label class="checkbox-inline"><input type="checkbox" id="type6">类型5</label>
+                        </div>
+                        <div class="form-group">
+                                <label class="control-labe">缺陷比例：</label>
+                                <input type="text" value="" id="defect_prop">
+                        </div>
+                        <div class="form-group">
+                            <label>检测结果：</label>
+                            <select class="form-control" id="test_result">
+                                <option>无</option>
+                                <option>合格</option>
+                                <option>返修</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">备注信息：</label>
+                            <textarea class="form-control" rows="3" placeholder="请输入备注信息" id="test_notes"></textarea>
+                        </div>
+                        <input disabled hidden type="text" value="" id="spot_id">
+                    </form>
+                    <div class="form-group">
+                        <button class="btn btn-default" id="test_result_submit">提交检测结果</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    $(document).ready(function(){
+        $('#task_code_selection').change(
+	    function (){
+	        $('#select_task').submit();
+        }
+    );
+});
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#spot_table>tbody>tr>td').click(
+            function () {
+                $.get(
+                    '/RayTest/raytest_result_save/',
+                    {
+                        spot_id: $(this).children('a').children('span').text()
+                    },
+                    function (data){
+                        var data = JSON.parse(data);
+                        $('#spot_id').val(data.spot_id);
+                        $('#spot_code_display').val(data.spot_code);
+                        $('#ray_inspector_code').val(data.inspector);
+                        $('#test_notes').val(data.ray_test_notes);
+                        $('#test_result').val(data.ray_test_result).attr('selected', 'selected');
+                        $('#ray_img').attr('src', '/static/ray_images/' + data.spot_code + '.png');
+                });
+            });
+});
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#test_result_submit').click(
+            function () {
+                if ($('#spot_id').val() == '')
+                {alert('请选择焊点')}
+                else {
+                    $.post(
+                    '/RayTest/raytest_result_save/',
+                    {
+                        spot_id: $('#spot_id').val(),
+                        inspector: $('#ray_inspector_code').val(),
+                        test_result: $('#test_result').val(),
+                        test_notes: $('#test_notes').val()
+                    },
+                    function (data){
+                        alert('检测结果提交成功！\n备注信息：'+data)
+                        })
+                };
+            });
+});
+</script>
+
+</body>
+</html>
